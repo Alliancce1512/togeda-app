@@ -45,12 +45,11 @@ import androidx.compose.ui.unit.sp
 import com.togeda.app.R
 import com.togeda.app.presentation.common.LoginTextField
 import com.togeda.app.presentation.common.UiState
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = koinViewModel(),
+    viewModel: LoginViewModel,
     onNavigateToFeed: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -64,13 +63,13 @@ fun LoginScreen(
             is UiState.Success -> {
                 if (loginState.data != null) {
                     Toast.makeText(context, loginSuccessMessage, Toast.LENGTH_SHORT).show()
-                    onNavigateToFeed()
                 }
             }
             is UiState.Error -> {
                 Toast.makeText(context, loginState.message, Toast.LENGTH_LONG).show()
             }
-            else -> {}
+            is UiState.Idle -> {}
+            is UiState.Loading -> {}
         }
     }
 

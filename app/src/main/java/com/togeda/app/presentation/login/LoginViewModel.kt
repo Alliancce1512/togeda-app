@@ -2,7 +2,6 @@ package com.togeda.app.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.togeda.app.R
 import com.togeda.app.domain.usecase.LoginUseCase
 import com.togeda.app.presentation.common.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +16,11 @@ class LoginViewModel(
 
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
+    
+    init {
+        // Reset login state to idle when ViewModel is created
+        _state.update { it.copy(loginState = UiState.Idle) }
+    }
 
     fun onEmailChange(email: String) {
         _state.update { it.copy(email = email) }
@@ -31,7 +35,7 @@ class LoginViewModel(
     }
 
     fun onForgotPasswordClick() {
-        // TODO: Navigate to forgot password screen
+        // TODO: Implement forgot password functionality
     }
 
     fun onLoginClick() {
@@ -47,29 +51,26 @@ class LoginViewModel(
 
         viewModelScope.launch {
             try {
-                // Check against hardcoded credentials
-                if (currentState.email == "test" && currentState.password == "test") {
-                    _state.update { 
-                        it.copy(
-                            loginState = UiState.Success(
-                                com.togeda.app.domain.model.User(
-                                    id = "1",
-                                    email = currentState.email,
-                                    name = "Togeda User",
-                                    token = "mock_token_123"
-                                )
-                            ),
-                            isLoading = false
-                        )
+                // Use the real API login
+                val result = loginUseCase(currentState.email, currentState.password)
+                result.fold(
+                    onSuccess = { user ->
+                        _state.update { 
+                            it.copy(
+                                loginState = UiState.Success(user),
+                                isLoading = false
+                            )
+                        }
+                    },
+                    onFailure = { exception ->
+                        _state.update { 
+                            it.copy(
+                                loginState = UiState.Error(exception.message ?: "Login failed"),
+                                isLoading = false
+                            )
+                        }
                     }
-                } else {
-                    _state.update { 
-                        it.copy(
-                            loginState = UiState.Error("Invalid email or password"),
-                            isLoading = false
-                        )
-                    }
-                }
+                )
             } catch (e: Exception) {
                 _state.update { 
                     it.copy(
@@ -78,6 +79,15 @@ class LoginViewModel(
                     )
                 }
             }
+        }
+    }
+
+    fun resetLoginState() {
+        _state.update { 
+            it.copy(
+                loginState = UiState.Idle,
+                isLoading = false
+            )
         }
     }
 }

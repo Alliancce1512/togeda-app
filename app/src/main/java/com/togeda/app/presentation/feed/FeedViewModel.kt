@@ -2,6 +2,7 @@ package com.togeda.app.presentation.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.togeda.app.domain.repository.AuthRepository
 import com.togeda.app.domain.usecase.GetEventsUseCase
 import com.togeda.app.presentation.common.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,11 +12,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FeedViewModel(
-    private val getEventsUseCase: GetEventsUseCase
+    private val getEventsUseCase: GetEventsUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FeedState())
     val state: StateFlow<FeedState> = _state.asStateFlow()
+    
+    private val _showLogoutDialog = MutableStateFlow(false)
+    val showLogoutDialog: StateFlow<Boolean> = _showLogoutDialog.asStateFlow()
 
     init {
         loadEvents()
@@ -52,5 +57,20 @@ class FeedViewModel(
                 }
             }
         }
+    }
+    
+    fun onLogoutClick() {
+        _showLogoutDialog.value = true
+    }
+    
+    fun onLogoutConfirm() {
+        viewModelScope.launch {
+            authRepository.logout()
+            _showLogoutDialog.value = false
+        }
+    }
+    
+    fun onLogoutCancel() {
+        _showLogoutDialog.value = false
     }
 } 

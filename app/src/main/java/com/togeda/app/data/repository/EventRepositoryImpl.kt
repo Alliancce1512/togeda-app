@@ -15,8 +15,8 @@ class EventRepositoryImpl : EventRepository {
                 id = "1",
                 title = "Два дни в Милано",
                 organizer = "Nikolay Atanasov",
-                organizerAvatar = null, // Will use placeholder drawable
-                imageUrl = null, // Will use placeholder drawable
+                organizerAvatar = null,
+                imageUrl = null,
                 isFree = true,
                 startDate = "16.02",
                 endDate = "17.02",
@@ -32,8 +32,8 @@ class EventRepositoryImpl : EventRepository {
                 id = "2",
                 title = "Weekend in Paris",
                 organizer = "Maria Petrova",
-                organizerAvatar = null, // Will use placeholder drawable
-                imageUrl = null, // Will use placeholder drawable
+                organizerAvatar = null,
+                imageUrl = null,
                 isFree = false,
                 startDate = "20.02",
                 endDate = "22.02",
@@ -52,7 +52,6 @@ class EventRepositoryImpl : EventRepository {
     override fun getEvents(): Flow<List<Event>> = eventsFlow
     
     override suspend fun refreshEvents() {
-        // In a real implementation, this would fetch from API
-        // For now, we'll just keep the mock data
+        // Mock data refresh - no actual API call
     }
 } 

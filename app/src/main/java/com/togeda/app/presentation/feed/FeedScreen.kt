@@ -1,15 +1,39 @@
 package com.togeda.app.presentation.feed
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,7 +54,7 @@ fun FeedScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsState()
-    val colorScheme = MaterialTheme.colorScheme
+    val colorScheme = colorScheme
 
     Box(
         modifier = modifier
@@ -42,9 +66,10 @@ fun FeedScreen(
         ) {
             // Top Bar
             TopBar(
-                onFilterClick = { /* TODO */ },
-                onSearchClick = { /* TODO */ },
-                onNotificationClick = { /* TODO */ }
+                onFilterClick = { },
+                onSearchClick = { },
+                onNotificationClick = { },
+                onLogoutClick = { viewModel.onLogoutClick() }
             )
             
             // Tab Navigation
@@ -79,6 +104,30 @@ fun FeedScreen(
         ) {
             BottomNavigation()
         }
+        
+        // Logout Confirmation Dialog
+        val showLogoutDialog by viewModel.showLogoutDialog.collectAsState()
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.onLogoutCancel() },
+                title = { Text("Logout") },
+                text = { Text("Are you sure you want to logout?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = { viewModel.onLogoutConfirm() }
+                    ) {
+                        Text("Yes, Logout")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { viewModel.onLogoutCancel() }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -86,10 +135,9 @@ fun FeedScreen(
 private fun TopBar(
     onFilterClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onNotificationClick: () -> Unit
+    onNotificationClick: () -> Unit,
+    onLogoutClick: () -> Unit
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -123,6 +171,13 @@ private fun TopBar(
             TopNavButton(
                 onClick = onNotificationClick,
                 icon    = Icons.Default.Notifications
+            )
+
+            TopNavButton(
+                onClick = onLogoutClick,
+                icon    = Icons.AutoMirrored.Filled.Logout,
+                backgroundColor = colorScheme.errorContainer,
+                iconColor = colorScheme.onErrorContainer
             )
         }
     }
@@ -159,15 +214,13 @@ private fun TabNavigation(
     selectedTab: FeedTab,
     onTabSelected: (FeedTab) -> Unit
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-    
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        FeedTab.values().forEach { tab ->
+        FeedTab.entries.forEach { tab ->
             val isSelected = tab == selectedTab
             Button(
                 onClick = { onTabSelected(tab) },
@@ -226,7 +279,7 @@ private fun ClubsContent() {
     ) {
         Text(
             text = "Clubs content coming soon",
-            color = MaterialTheme.colorScheme.onBackground
+            color = colorScheme.onBackground
         )
     }
 }
@@ -239,7 +292,7 @@ private fun FriendsContent() {
     ) {
         Text(
             text = "Friends content coming soon",
-            color = MaterialTheme.colorScheme.onBackground
+            color = colorScheme.onBackground
         )
     }
 }
@@ -286,7 +339,7 @@ private fun BottomNavigation() {
         // Chat
         IconButton(onClick = {}) {
             Icon(
-                imageVector = Icons.Default.Chat,
+                imageVector = Icons.AutoMirrored.Filled.Chat,
                 contentDescription = "Chat",
                 tint = Color(0xFF444444),
                 modifier = Modifier.size(24.dp)

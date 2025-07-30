@@ -7,7 +7,7 @@ data class LoginState(
     val email: String = "",
     val password: String = "",
     val passwordVisible: Boolean = false,
-    val loginState: UiState<User> = UiState.Success(null),
+    val loginState: UiState<User> = UiState.Idle,
     val isLoading: Boolean = false
 )
 
