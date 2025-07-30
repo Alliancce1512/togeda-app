@@ -1,5 +1,6 @@
 package com.togeda.app.presentation.login
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -49,28 +51,31 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(),
-    onNavigateToHome: () -> Unit = {},
-    onNavigateToForgotPassword: () -> Unit = {}
+    onNavigateToFeed: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsState()
     val colorScheme = MaterialTheme.colorScheme
+    val context = LocalContext.current
+    val loginSuccessMessage = stringResource(R.string.login_success)
 
     LaunchedEffect(state.loginState) {
         when (val loginState = state.loginState) {
             is UiState.Success -> {
                 if (loginState.data != null) {
-                    onNavigateToHome()
+                    Toast.makeText(context, loginSuccessMessage, Toast.LENGTH_SHORT).show()
+                    onNavigateToFeed()
                 }
             }
             is UiState.Error -> {
-                // Show error message (snackbar, toast, etc.)
+                Toast.makeText(context, loginState.message, Toast.LENGTH_LONG).show()
             }
             else -> {}
         }
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(colorScheme.background)
     ) {
@@ -177,7 +182,7 @@ fun LoginScreen(
                 )
             ) {
                 Text(
-                    text = stringResource(R.string.sign_in),
+                    text = if (state.isLoading) "Signing In..." else stringResource(R.string.sign_in),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 )

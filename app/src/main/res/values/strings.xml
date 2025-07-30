@@ -9,4 +9,8 @@
     <string name="password_icon_desc">Password icon</string>
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
+    <string name="login_success">Login successful!</string>
+    <string name="login_error_invalid_credentials">Invalid email or password</string>
+    <string name="login_error_empty_fields">Email and password cannot be empty</string>
+    <string name="login_error_failed">Login failed</string>
 </resources>

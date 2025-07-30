@@ -10,3 +10,4 @@ data class LoginState(
     val loginState: UiState<User> = UiState.Success(null),
     val isLoading: Boolean = false
 )
+

@@ -9,3 +9,4 @@ interface AuthRepository {
     fun getCurrentUser(): Flow<User?>
     fun isLoggedIn(): Flow<Boolean>
 }
+

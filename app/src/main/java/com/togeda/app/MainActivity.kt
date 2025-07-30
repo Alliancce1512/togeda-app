@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.togeda.app.presentation.login.LoginScreen
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.Modifier
+import com.togeda.app.presentation.navigation.AppNavigation
 import com.togeda.app.ui.theme.TogedaTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +16,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TogedaTheme {
-                LoginScreen()
+                AppNavigation(
+                    modifier = Modifier.statusBarsPadding()
+                )
             }
         }
     }
