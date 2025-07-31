@@ -9,11 +9,6 @@ data class PostsResponse(
     val listCount   : Long
 )
 
-data class PersonalizedFeedResponse(
-    val posts       : PostsResponse,
-    val sessionId   : String?
-)
-
 data class PostResponseDto(
     val id                          : String?,
     val title                       : String?,
@@ -75,14 +70,14 @@ data class Currency(
 interface PostsApi {
     @GET("posts")
     suspend fun getAllPosts(
-        @Query("sortBy") sortBy: String,
-        @Query("longitude") longitude: Double,
-        @Query("latitude") latitude: Double,
-        @Query("distance") distance: Int,
-        @Query("pageNumber") pageNumber: Int,
-        @Query("pageSize") pageSize: Int,
-        @Query("categories") categories: List<String>? = null,
-        @Query("toDate") toDate: String? = null,
-        @Query("fromDate") fromDate: String? = null
+        @Query("sortBy") sortBy         : String,
+        @Query("longitude") longitude   : Double,
+        @Query("latitude") latitude     : Double,
+        @Query("distance") distance     : Int,
+        @Query("pageNumber") pageNumber : Int,
+        @Query("pageSize") pageSize     : Int,
+        @Query("categories") categories : List<String>? = null,
+        @Query("toDate") toDate         : String?       = null,
+        @Query("fromDate") fromDate     : String?       = null
     ): PostsResponse
 } 

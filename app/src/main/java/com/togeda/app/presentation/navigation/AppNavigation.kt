@@ -14,21 +14,21 @@ import androidx.compose.ui.Modifier
 import com.togeda.app.domain.repository.AuthRepository
 import com.togeda.app.presentation.feed.FeedScreen
 import com.togeda.app.presentation.login.LoginScreen
+import com.togeda.app.presentation.login.LoginViewModel
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.koinViewModel
 
 sealed class Screen {
-    object Login : Screen()
-    object Feed : Screen()
+    object Login    : Screen()
+    object Feed     : Screen()
 }
 
 @Composable
-fun AppNavigation(
-    modifier: Modifier = Modifier
-) {
+fun AppNavigation(modifier: Modifier = Modifier) {
+
     var currentScreen by remember { mutableStateOf<Screen?>(null) }
     val authRepository = get<AuthRepository>()
-    
-    // Handle login/logout state changes
+
     LaunchedEffect(Unit) {
         authRepository.isLoggedIn().collect { isLoggedIn ->
             currentScreen = if (isLoggedIn) Screen.Feed else Screen.Login
@@ -36,29 +36,28 @@ fun AppNavigation(
     }
     
     when (currentScreen) {
-        Screen.Login -> {
-            val loginViewModel: com.togeda.app.presentation.login.LoginViewModel = org.koin.androidx.compose.koinViewModel()
-            androidx.compose.runtime.LaunchedEffect(currentScreen) {
+        Screen.Login    -> {
+            val loginViewModel: LoginViewModel = koinViewModel()
+
+            LaunchedEffect(currentScreen) {
                 loginViewModel.resetLoginState()
             }
+
             LoginScreen(
-                viewModel = loginViewModel,
-                onNavigateToFeed = {
-                    currentScreen = Screen.Feed
-                },
-                modifier = modifier
+                viewModel   = loginViewModel,
+                modifier    = modifier
             )
         }
-        Screen.Feed -> {
+        Screen.Feed     -> {
             FeedScreen(
                 modifier = modifier
             )
         }
-        null -> {
+        null            -> {
             // Loading state
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier            = Modifier.fillMaxSize(),
+                contentAlignment    = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }

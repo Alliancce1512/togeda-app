@@ -8,15 +8,12 @@ import com.togeda.app.data.remote.generated.UserControllerApi
 import com.togeda.app.data.repository.AuthRepositoryImpl
 import com.togeda.app.data.repository.EventRepositoryImpl
 import com.togeda.app.data.security.TokenManager
-import com.togeda.app.data.security.TokenRefreshManager
 import com.togeda.app.domain.repository.AuthRepository
 import com.togeda.app.domain.repository.EventRepository
 import com.togeda.app.domain.usecase.GetEventsUseCase
 import com.togeda.app.domain.usecase.LoginUseCase
 import com.togeda.app.presentation.feed.FeedViewModel
 import com.togeda.app.presentation.login.LoginViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -102,10 +99,9 @@ val appModule = module {
 
     // Token Management
     single { TokenManager(get()) }
-    single { TokenRefreshManager(get(), get(), CoroutineScope(Dispatchers.IO)) }
 
     // Repositories
-    single<AuthRepository> { AuthRepositoryImpl(get(), get(), get()) }
+    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
     single<EventRepository> { EventRepositoryImpl(get(), get()) }
 
     // Use Cases

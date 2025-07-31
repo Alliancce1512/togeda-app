@@ -90,7 +90,6 @@ fun FeedScreen(
                 when (state.selectedTab) {
                     FeedTab.EVENTS  -> EventsContent(
                         eventsState = state.eventsState,
-                        isLoading   = state.isLoading,
                         onRefresh   = viewModel::onRefresh
                     )
                     FeedTab.CLUBS   -> ClubsContent()
@@ -110,6 +109,7 @@ fun FeedScreen(
         
         // Logout Confirmation Dialog
         val showLogoutDialog by viewModel.showLogoutDialog.collectAsState()
+
         if (showLogoutDialog) {
             AlertDialog(
                 onDismissRequest    = viewModel::onLogoutCancel,
@@ -247,7 +247,6 @@ private fun TabNavigation(
 @Composable
 private fun EventsContent(
     eventsState : UiState<List<Event>>,
-    isLoading   : Boolean,
     onRefresh   : () -> Unit
 ) {
     Box(
@@ -290,10 +289,10 @@ private fun EventsContent(
                                 textAlign   = TextAlign.Center
                             )
                             Text(
-                                text = "Try refreshing or check back later",
-                                fontSize = 14.sp,
-                                color = colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center
+                                text        = "Try refreshing or check back later",
+                                fontSize    = 14.sp,
+                                color       = colorScheme.onSurfaceVariant,
+                                textAlign   = TextAlign.Center
                             )
                             Button(
                                 onClick = onRefresh,

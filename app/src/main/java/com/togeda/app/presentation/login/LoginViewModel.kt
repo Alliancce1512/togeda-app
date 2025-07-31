@@ -10,9 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class LoginViewModel(
-    private val loginUseCase: LoginUseCase
-) : ViewModel() {
+class LoginViewModel(private val loginUseCase: LoginUseCase) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
@@ -40,6 +38,7 @@ class LoginViewModel(
 
     fun onLoginClick() {
         val currentState = _state.value
+
         if (currentState.email.isBlank() || currentState.password.isBlank()) {
             _state.update { 
                 it.copy(loginState = UiState.Error("Email and password cannot be empty"))
@@ -51,22 +50,22 @@ class LoginViewModel(
 
         viewModelScope.launch {
             try {
-                // Use the real API login
                 val result = loginUseCase(currentState.email, currentState.password)
+
                 result.fold(
                     onSuccess = { user ->
                         _state.update { 
                             it.copy(
-                                loginState = UiState.Success(user),
-                                isLoading = false
+                                loginState  = UiState.Success(user),
+                                isLoading   = false
                             )
                         }
                     },
                     onFailure = { exception ->
                         _state.update { 
                             it.copy(
-                                loginState = UiState.Error(exception.message ?: "Login failed"),
-                                isLoading = false
+                                loginState  = UiState.Error(exception.message ?: "Login failed"),
+                                isLoading   = false
                             )
                         }
                     }
@@ -74,8 +73,8 @@ class LoginViewModel(
             } catch (e: Exception) {
                 _state.update { 
                     it.copy(
-                        loginState = UiState.Error(e.message ?: "Login failed"),
-                        isLoading = false
+                        loginState  = UiState.Error(e.message ?: "Login failed"),
+                        isLoading   = false
                     )
                 }
             }
@@ -85,8 +84,8 @@ class LoginViewModel(
     fun resetLoginState() {
         _state.update { 
             it.copy(
-                loginState = UiState.Idle,
-                isLoading = false
+                loginState  = UiState.Idle,
+                isLoading   = false
             )
         }
     }

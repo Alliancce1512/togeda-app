@@ -49,13 +49,12 @@ import com.togeda.app.presentation.common.UiState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel,
-    onNavigateToFeed: () -> Unit = {},
-    modifier: Modifier = Modifier
+    viewModel   : LoginViewModel,
+    modifier    : Modifier = Modifier
 ) {
-    val state by viewModel.state.collectAsState()
-    val colorScheme = MaterialTheme.colorScheme
-    val context = LocalContext.current
+    val state              by viewModel.state.collectAsState()
+    val colorScheme         = MaterialTheme.colorScheme
+    val context             = LocalContext.current
     val loginSuccessMessage = stringResource(R.string.login_success)
 
     LaunchedEffect(state.loginState) {
@@ -65,11 +64,10 @@ fun LoginScreen(
                     Toast.makeText(context, loginSuccessMessage, Toast.LENGTH_SHORT).show()
                 }
             }
-            is UiState.Error -> {
+            is UiState.Error    -> {
                 Toast.makeText(context, loginState.message, Toast.LENGTH_LONG).show()
             }
-            is UiState.Idle -> {}
-            is UiState.Loading -> {}
+            else                -> { }
         }
     }
 
@@ -79,85 +77,90 @@ fun LoginScreen(
             .background(colorScheme.background)
     ) {
         Column(
-            modifier = Modifier
+            modifier            = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
             Spacer(modifier = Modifier.height(64.dp))
+
             // Title
             Text(
-                text = stringResource(R.string.login_title),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.onBackground,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
+                modifier    = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp)
+                    .padding(bottom = 32.dp),
+                text        = stringResource(R.string.login_title),
+                fontSize    = 32.sp,
+                fontWeight  = FontWeight.Bold,
+                color       = colorScheme.onBackground,
+                textAlign   = TextAlign.Center
             )
+
             // Email field
             LoginTextField(
-                value = state.email,
-                onValueChange = { viewModel.onEmailChange(it) },
-                label = stringResource(R.string.email_label),
-                leadingIcon = {
+                value           = state.email,
+                onValueChange   = viewModel::onEmailChange,
+                label           = stringResource(R.string.email_label),
+                leadingIcon     = {
                     Icon(
-                        imageVector = Icons.Default.Email,
-                        contentDescription = stringResource(R.string.email_icon_desc),
-                        tint = colorScheme.tertiary
+                        imageVector         = Icons.Default.Email,
+                        contentDescription  = stringResource(R.string.email_icon_desc),
+                        tint                = colorScheme.tertiary
                     )
                 },
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
+                    keyboardType    = KeyboardType.Email,
+                    imeAction       = ImeAction.Next
                 ),
-                isError = state.loginState is UiState.Error
+                isError         = state.loginState is UiState.Error
             )
+
             // Password field
             LoginTextField(
-                value = state.password,
-                onValueChange = { viewModel.onPasswordChange(it) },
-                label = stringResource(R.string.password_label),
-                leadingIcon = {
+                value                   = state.password,
+                onValueChange           = viewModel::onPasswordChange,
+                label                   = stringResource(R.string.password_label),
+                leadingIcon             = {
                     Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = stringResource(R.string.password_icon_desc),
-                        tint = colorScheme.tertiary
+                        imageVector         = Icons.Default.Lock,
+                        contentDescription  = stringResource(R.string.password_icon_desc),
+                        tint                = colorScheme.tertiary
                     )
                 },
-                trailingIcon = {
+                trailingIcon            = {
                     IconButton(onClick = { viewModel.onPasswordVisibilityToggle() }) {
                         Icon(
-                            imageVector = if (state.passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (state.passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password),
-                            tint = colorScheme.tertiary
+                            imageVector         = if (state.passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription  = if (state.passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password),
+                            tint                = colorScheme.tertiary
                         )
                     }
                 },
-                visualTransformation = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation    = if (state.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 ),
-                isError = state.loginState is UiState.Error
+                isError                 = state.loginState is UiState.Error
             )
+
             // Forgot password text
             TextButton(
-                onClick = { viewModel.onForgotPasswordClick() },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(top = 8.dp, bottom = 16.dp)
+                    .padding(top = 8.dp, bottom = 16.dp),
+                onClick     = viewModel::onForgotPasswordClick
             ) {
                 Text(
-                    text = stringResource(R.string.forgot_password),
-                    color = colorScheme.secondary,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
+                    text        = stringResource(R.string.forgot_password),
+                    color       = colorScheme.secondary,
+                    fontSize    = 16.sp,
+                    fontWeight  = FontWeight.Medium
                 )
             }
         }
+
         // Sign In button at the bottom, above keyboard
         Box(
             modifier = Modifier
@@ -167,23 +170,23 @@ fun LoginScreen(
                 .padding(16.dp)
         ) {
             Button(
-                onClick = { viewModel.onLoginClick() },
-                modifier = Modifier
+                modifier    = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(16.dp),
-                enabled = !state.isLoading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.surface,
-                    disabledContainerColor = colorScheme.surface,
-                    contentColor = colorScheme.tertiary,
-                    disabledContentColor = colorScheme.tertiary
+                onClick     = viewModel::onLoginClick,
+                shape       = RoundedCornerShape(16.dp),
+                enabled     = !state.isLoading,
+                colors      = ButtonDefaults.buttonColors(
+                    containerColor          = colorScheme.surface,
+                    disabledContainerColor  = colorScheme.surface,
+                    contentColor            = colorScheme.tertiary,
+                    disabledContentColor    = colorScheme.tertiary
                 )
             ) {
                 Text(
-                    text = if (state.isLoading) "Signing In..." else stringResource(R.string.sign_in),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
+                    text        = if (state.isLoading) "Signing In..." else stringResource(R.string.sign_in),
+                    fontSize    = 18.sp,
+                    fontWeight  = FontWeight.Medium
                 )
             }
         }

@@ -21,7 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.EventNote
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
@@ -29,7 +28,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.ShareLocation
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -52,20 +50,20 @@ import com.togeda.app.domain.model.Event
 
 @Composable
 fun EventCard(
-    event: Event,
-    modifier: Modifier = Modifier,
-    onEventClick: () -> Unit = {},
-    onBookmarkClick: () -> Unit = {},
-    onMoreClick: () -> Unit = {}
+    event           : Event,
+    modifier        : Modifier      = Modifier,
+    onEventClick    : () -> Unit    = {},
+    onBookmarkClick : () -> Unit    = {},
+    onMoreClick     : () -> Unit    = {}
 ) {
     val colorScheme = MaterialTheme.colorScheme
     
     Card(
-        modifier = modifier
+        modifier    = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
+        shape       = RoundedCornerShape(16.dp),
+        colors      = CardDefaults.cardColors(
             containerColor = colorScheme.surface
         )
     ) {

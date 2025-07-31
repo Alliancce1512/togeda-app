@@ -29,20 +29,20 @@ class TokenManager(context: Context) {
     val isLoggedIn: Flow<Boolean> = _isLoggedIn.asStateFlow()
 
     companion object {
-        private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_ACCESS_TOKEN  = "access_token"
         private const val KEY_REFRESH_TOKEN = "refresh_token"
-        private const val KEY_USER_ID = "user_id"
-        private const val KEY_TOKEN_EXPIRY = "token_expiry"
+        private const val KEY_USER_ID       = "user_id"
+        private const val KEY_TOKEN_EXPIRY  = "token_expiry"
     }
 
     /**
      * Store authentication tokens securely
      */
     fun storeTokens(
-        accessToken: String,
-        refreshToken: String,
-        userId: String,
-        expiresIn: Long? = null
+        accessToken     : String,
+        refreshToken    : String,
+        userId          : String,
+        expiresIn       : Long? = null
     ) {
         encryptedSharedPreferences.edit()
             .putString(KEY_ACCESS_TOKEN, accessToken)
@@ -102,20 +102,6 @@ class TokenManager(context: Context) {
     }
 
     /**
-     * Update access token (e.g., after refresh)
-     */
-    fun updateAccessToken(newAccessToken: String, expiresIn: Long? = null) {
-        encryptedSharedPreferences.edit()
-            .putString(KEY_ACCESS_TOKEN, newAccessToken)
-            .apply {
-                if (expiresIn != null) {
-                    putLong(KEY_TOKEN_EXPIRY, System.currentTimeMillis() + (expiresIn * 1000))
-                }
-            }
-            .apply()
-    }
-
-    /**
      * Clear all stored tokens (logout)
      */
     fun clearTokens() {
@@ -127,23 +113,5 @@ class TokenManager(context: Context) {
             .apply()
 
         _isLoggedIn.value = false
-    }
-
-    /**
-     * Get token expiry time
-     */
-    fun getTokenExpiry(): Long {
-        return encryptedSharedPreferences.getLong(KEY_TOKEN_EXPIRY, 0L)
-    }
-
-    /**
-     * Check if token is about to expire (within 5 minutes)
-     */
-    fun isTokenExpiringSoon(): Boolean {
-        val expiryTime = getTokenExpiry()
-        if (expiryTime == 0L) return false
-        
-        val fiveMinutesInMillis = 5 * 60 * 1000L
-        return System.currentTimeMillis() + fiveMinutesInMillis >= expiryTime
     }
 } 

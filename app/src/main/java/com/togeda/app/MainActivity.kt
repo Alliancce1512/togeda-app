@@ -12,12 +12,11 @@ import com.togeda.app.ui.theme.TogedaTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             TogedaTheme {
-                AppNavigation(
-                    modifier = Modifier.statusBarsPadding()
-                )
+                AppNavigation(modifier = Modifier.statusBarsPadding())
             }
         }
     }

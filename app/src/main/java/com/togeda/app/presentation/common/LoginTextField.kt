@@ -18,47 +18,47 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    isError: Boolean = false,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    singleLine: Boolean = true,
-    shape: RoundedCornerShape = RoundedCornerShape(16.dp),
-    containerColor: Color = MaterialTheme.colorScheme.surface,
-    textColor: Color = MaterialTheme.colorScheme.onSurface,
-    labelColor: Color = MaterialTheme.colorScheme.tertiary
+    value                   : String,
+    onValueChange           : (String) -> Unit,
+    label                   : String,
+    leadingIcon             : @Composable (() -> Unit)? = null,
+    trailingIcon            : @Composable (() -> Unit)? = null,
+    visualTransformation    : VisualTransformation = VisualTransformation.None,
+    keyboardOptions         : KeyboardOptions = KeyboardOptions.Default,
+    isError                 : Boolean = false,
+    modifier                : Modifier = Modifier,
+    enabled                 : Boolean = true,
+    singleLine              : Boolean = true,
+    shape                   : RoundedCornerShape = RoundedCornerShape(16.dp),
+    containerColor          : Color = MaterialTheme.colorScheme.surface,
+    textColor               : Color = MaterialTheme.colorScheme.onSurface,
+    labelColor              : Color = MaterialTheme.colorScheme.tertiary
 ) {
     OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, color = labelColor) },
-        leadingIcon = leadingIcon,
-        trailingIcon = trailingIcon,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        isError = isError,
-        modifier = modifier
+        modifier                = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        enabled = enabled,
-        singleLine = singleLine,
-        shape = shape,
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = containerColor,
+        value                   = value,
+        onValueChange           = onValueChange,
+        label                   = { Text(label, color = labelColor) },
+        leadingIcon             = leadingIcon,
+        trailingIcon            = trailingIcon,
+        visualTransformation    = visualTransformation,
+        keyboardOptions         = keyboardOptions,
+        isError                 = isError,
+        enabled                 = enabled,
+        singleLine              = singleLine,
+        shape                   = shape,
+        colors                  = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor   = containerColor,
             unfocusedContainerColor = containerColor,
-            disabledContainerColor = containerColor,
-            focusedTextColor = textColor,
-            unfocusedTextColor = textColor,
-            disabledTextColor = labelColor,
-            focusedLabelColor = labelColor,
-            unfocusedLabelColor = labelColor,
-            cursorColor = textColor
+            disabledContainerColor  = containerColor,
+            focusedTextColor        = textColor,
+            unfocusedTextColor      = textColor,
+            disabledTextColor       = labelColor,
+            focusedLabelColor       = labelColor,
+            unfocusedLabelColor     = labelColor,
+            cursorColor             = textColor
         )
     )
 }
