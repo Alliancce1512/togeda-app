@@ -42,16 +42,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.togeda.app.domain.model.Event
 import com.togeda.app.presentation.common.EventCard
+import com.togeda.app.presentation.common.UiState
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
-    viewModel: FeedViewModel = koinViewModel(),
-    modifier: Modifier = Modifier
+    viewModel   : FeedViewModel = koinViewModel(),
+    modifier    : Modifier      = Modifier
 ) {
     val state by viewModel.state.collectAsState()
     val colorScheme = colorScheme
@@ -66,16 +69,16 @@ fun FeedScreen(
         ) {
             // Top Bar
             TopBar(
-                onFilterClick = { },
-                onSearchClick = { },
+                onFilterClick       = { },
+                onSearchClick       = { },
                 onNotificationClick = { },
-                onLogoutClick = { viewModel.onLogoutClick() }
+                onLogoutClick       = viewModel::onLogoutClick
             )
             
             // Tab Navigation
             TabNavigation(
-                selectedTab = state.selectedTab,
-                onTabSelected = { viewModel.onTabSelected(it) }
+                selectedTab     = state.selectedTab,
+                onTabSelected   = { viewModel.onTabSelected(it) }
             )
             
             // Content based on selected tab
@@ -85,12 +88,12 @@ fun FeedScreen(
                     .weight(1f)
             ) {
                 when (state.selectedTab) {
-                    FeedTab.EVENTS -> EventsContent(
-                        events = state.events,
-                        isLoading = state.isLoading,
-                        onRefresh = { viewModel.onRefresh() }
+                    FeedTab.EVENTS  -> EventsContent(
+                        eventsState = state.eventsState,
+                        isLoading   = state.isLoading,
+                        onRefresh   = viewModel::onRefresh
                     )
-                    FeedTab.CLUBS -> ClubsContent()
+                    FeedTab.CLUBS   -> ClubsContent()
                     FeedTab.FRIENDS -> FriendsContent()
                 }
             }
@@ -109,19 +112,19 @@ fun FeedScreen(
         val showLogoutDialog by viewModel.showLogoutDialog.collectAsState()
         if (showLogoutDialog) {
             AlertDialog(
-                onDismissRequest = { viewModel.onLogoutCancel() },
-                title = { Text("Logout") },
-                text = { Text("Are you sure you want to logout?") },
-                confirmButton = {
+                onDismissRequest    = viewModel::onLogoutCancel,
+                title               = { Text("Logout") },
+                text                = { Text("Are you sure you want to logout?") },
+                confirmButton       = {
                     TextButton(
-                        onClick = { viewModel.onLogoutConfirm() }
+                        onClick = viewModel::onLogoutConfirm
                     ) {
                         Text("Yes, Logout")
                     }
                 },
-                dismissButton = {
+                dismissButton       = {
                     TextButton(
-                        onClick = { viewModel.onLogoutCancel() }
+                        onClick = viewModel::onLogoutCancel
                     ) {
                         Text("Cancel")
                     }
@@ -133,24 +136,24 @@ fun FeedScreen(
 
 @Composable
 private fun TopBar(
-    onFilterClick: () -> Unit,
-    onSearchClick: () -> Unit,
-    onNotificationClick: () -> Unit,
-    onLogoutClick: () -> Unit
+    onFilterClick       : () -> Unit,
+    onSearchClick       : () -> Unit,
+    onNotificationClick : () -> Unit,
+    onLogoutClick       : () -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier            = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment   = Alignment.CenterVertically
     ) {
         // App title
         Text(
-            text = "Togeda",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorScheme.onBackground,
-            modifier = Modifier.weight(1f)
+            modifier    = Modifier.weight(1f),
+            text        = "Togeda",
+            fontSize    = 28.sp,
+            fontWeight  = FontWeight.Bold,
+            color       = colorScheme.onBackground
         )
         
         // Action icons
@@ -174,10 +177,10 @@ private fun TopBar(
             )
 
             TopNavButton(
-                onClick = onLogoutClick,
-                icon    = Icons.AutoMirrored.Filled.Logout,
+                onClick         = onLogoutClick,
+                icon            = Icons.AutoMirrored.Filled.Logout,
                 backgroundColor = colorScheme.errorContainer,
-                iconColor = colorScheme.onErrorContainer
+                iconColor       = colorScheme.onErrorContainer
             )
         }
     }
@@ -211,30 +214,30 @@ private fun TopNavButton(
 
 @Composable
 private fun TabNavigation(
-    selectedTab: FeedTab,
-    onTabSelected: (FeedTab) -> Unit
+    selectedTab     : FeedTab,
+    onTabSelected   : (FeedTab) -> Unit
 ) {
     Row(
-        modifier = Modifier
+        modifier                = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement   = Arrangement.spacedBy(8.dp)
     ) {
         FeedTab.entries.forEach { tab ->
             val isSelected = tab == selectedTab
             Button(
-                onClick = { onTabSelected(tab) },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSelected) colorScheme.primary else colorScheme.surface,
-                    contentColor = if (isSelected) colorScheme.onPrimary else colorScheme.onSurface
+                onClick     = { onTabSelected(tab) },
+                modifier    = Modifier.weight(1f),
+                shape       = RoundedCornerShape(20.dp),
+                colors      = ButtonDefaults.buttonColors(
+                    containerColor  = if (isSelected) colorScheme.primary else colorScheme.surface,
+                    contentColor    = if (isSelected) colorScheme.onPrimary else colorScheme.onSurface
                 )
             ) {
                 Text(
-                    text = tab.name,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    text        = tab.name,
+                    fontSize    = 14.sp,
+                    fontWeight  = FontWeight.Medium
                 )
             }
         }
@@ -243,29 +246,113 @@ private fun TabNavigation(
 
 @Composable
 private fun EventsContent(
-    events: List<com.togeda.app.domain.model.Event>,
-    isLoading: Boolean,
-    onRefresh: () -> Unit
+    eventsState : UiState<List<Event>>,
+    isLoading   : Boolean,
+    onRefresh   : () -> Unit
 ) {
-    if (isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 8.dp)
-        ) {
-            items(events) { event ->
-                EventCard(
-                    event = event,
-                    onEventClick = { /* TODO: Navigate to event details */ },
-                    onBookmarkClick = { /* TODO: Bookmark event */ },
-                    onMoreClick = { /* TODO: Show more options */ }
-                )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when (eventsState) {
+            is UiState.Idle     -> {
+                Box(
+                    modifier            = Modifier.fillMaxSize(),
+                    contentAlignment    = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is UiState.Loading  -> {
+                Box(
+                    modifier            = Modifier.fillMaxSize(),
+                    contentAlignment    = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is UiState.Success  -> {
+                val events = eventsState.data ?: emptyList()
+
+                if (events.isEmpty()) {
+                    Box(
+                        modifier            = Modifier.fillMaxSize(),
+                        contentAlignment    = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(
+                                text        = "No events found",
+                                fontSize    = 18.sp,
+                                fontWeight  = FontWeight.Medium,
+                                color       = colorScheme.onBackground,
+                                textAlign   = TextAlign.Center
+                            )
+                            Text(
+                                text = "Try refreshing or check back later",
+                                fontSize = 14.sp,
+                                color = colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center
+                            )
+                            Button(
+                                onClick = onRefresh,
+                                colors  = ButtonDefaults.buttonColors(
+                                    containerColor = colorScheme.primary
+                                )
+                            ) {
+                                Text("Refresh")
+                            }
+                        }
+                    }
+                } else {
+                    LazyColumn(
+                        modifier        = Modifier.fillMaxSize(),
+                        contentPadding  = PaddingValues(vertical = 8.dp)
+                    ) {
+                        items(events) { event ->
+                            EventCard(
+                                event           = event,
+                                onEventClick    = { },
+                                onBookmarkClick = { },
+                                onMoreClick     = { }
+                            )
+                        }
+                    }
+                }
+            }
+            is UiState.Error    -> {
+                Box(
+                    modifier            = Modifier.fillMaxSize(),
+                    contentAlignment    = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text        = "Failed to load events",
+                            fontSize    = 18.sp,
+                            fontWeight  = FontWeight.Medium,
+                            color       = colorScheme.error,
+                            textAlign   = TextAlign.Center
+                        )
+                        Text(
+                            text        = eventsState.message,
+                            fontSize    = 14.sp,
+                            color       = colorScheme.onSurfaceVariant,
+                            textAlign   = TextAlign.Center
+                        )
+                        Button(
+                            onClick = onRefresh,
+                            colors  = ButtonDefaults.buttonColors(
+                                containerColor = colorScheme.primary
+                            )
+                        ) {
+                            Text("Try Again")
+                        }
+                    }
+                }
             }
         }
     }
@@ -274,12 +361,12 @@ private fun EventsContent(
 @Composable
 private fun ClubsContent() {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier            = Modifier.fillMaxSize(),
+        contentAlignment    = Alignment.Center
     ) {
         Text(
-            text = "Clubs content coming soon",
-            color = colorScheme.onBackground
+            text    = "Clubs content coming soon",
+            color   = colorScheme.onBackground
         )
     }
 }
@@ -287,12 +374,12 @@ private fun ClubsContent() {
 @Composable
 private fun FriendsContent() {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier            = Modifier.fillMaxSize(),
+        contentAlignment    = Alignment.Center
     ) {
         Text(
-            text = "Friends content coming soon",
-            color = colorScheme.onBackground
+            text    = "Friends content coming soon",
+            color   = colorScheme.onBackground
         )
     }
 }
@@ -300,59 +387,59 @@ private fun FriendsContent() {
 @Composable
 private fun BottomNavigation() {
     Row(
-        modifier = Modifier
+        modifier                = Modifier
             .fillMaxWidth()
             .background(color = colorScheme.surface),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement   = Arrangement.SpaceEvenly,
+        verticalAlignment       = Alignment.CenterVertically
     ) {
         // Home (selected)
         IconButton(onClick = {}) {
             Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = "Home",
-                tint = colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier            = Modifier.size(24.dp),
+                imageVector         = Icons.Default.Home,
+                contentDescription  = "Home",
+                tint                = colorScheme.primary
             )
         }
         
         // Map
         IconButton(onClick = {}) {
             Icon(
-                imageVector = Icons.Default.Map,
-                contentDescription = "Map",
-                tint = Color(0xFF444444),
-                modifier = Modifier.size(24.dp)
+                modifier            = Modifier.size(24.dp),
+                imageVector         = Icons.Default.Map,
+                contentDescription  = "Map",
+                tint                = Color(0xFF444444)
             )
         }
         
         // Add/Create
         IconButton(onClick = {}) {
             Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
-                tint = Color(0xFF444444),
-                modifier = Modifier.size(24.dp)
+                modifier            = Modifier.size(24.dp),
+                imageVector         = Icons.Default.Add,
+                contentDescription  = "Add",
+                tint                = Color(0xFF444444)
             )
         }
         
         // Chat
         IconButton(onClick = {}) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = "Chat",
-                tint = Color(0xFF444444),
-                modifier = Modifier.size(24.dp)
+                modifier            = Modifier.size(24.dp),
+                imageVector         = Icons.AutoMirrored.Filled.Chat,
+                contentDescription  = "Chat",
+                tint                = Color(0xFF444444)
             )
         }
         
         // Profile
         IconButton(onClick = {}) {
             Icon(
-                imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Profile",
-                tint = colorScheme.surface,
-                modifier = Modifier.size(24.dp)
+                modifier            = Modifier.size(24.dp),
+                imageVector         = Icons.Default.AccountCircle,
+                contentDescription  = "Profile",
+                tint                = colorScheme.surface,
             )
         }
     }

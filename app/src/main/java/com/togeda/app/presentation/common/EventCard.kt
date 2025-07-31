@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BookmarkBorder
@@ -40,9 +43,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.togeda.app.domain.model.Event
 
 @Composable
@@ -90,7 +95,7 @@ fun EventCard(
                 }
                 
                 Spacer(modifier = Modifier.width(12.dp))
-                
+
                 // Event title and organizer
                 Column(
                     modifier = Modifier.weight(1f)
@@ -110,7 +115,7 @@ fun EventCard(
                         color = colorScheme.tertiary
                     )
                 }
-                
+
                 // More options button
                 IconButton(onClick = onMoreClick) {
                     Icon(
@@ -120,54 +125,59 @@ fun EventCard(
                     )
                 }
             }
-            
-            
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .background(
-                        color = colorScheme.tertiary,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Image,
-                    contentDescription = "Event image",
-                    tint = colorScheme.onTertiary,
-                    modifier = Modifier.size(48.dp)
-                )
+
+            // Event images gallery
+            if (event.images.isNotEmpty()) {
+                EventImageGallery(images = event.images)
+            } else {
+                // Placeholder when no images
+                Box(
+                    modifier            = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(
+                            color = colorScheme.tertiary,
+                            shape = RoundedCornerShape(8.dp)
+                        ),
+                    contentAlignment    = Alignment.Center
+                ) {
+                    Icon(
+                        modifier            = Modifier.size(48.dp),
+                        imageVector         = Icons.Default.Image,
+                        contentDescription  = "No event image",
+                        tint                = colorScheme.onTertiary
+                    )
+                }
             }
-            
+
             // Action icons
             Row(
-                modifier            = Modifier.fillMaxWidth(),
-                verticalAlignment   = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier                = Modifier.fillMaxWidth(),
+                verticalAlignment       = Alignment.CenterVertically,
+                horizontalArrangement   = Arrangement.spacedBy(8.dp)
             ) {
 
                 IconButton(onClick = {}) {
                     Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Attendees",
-                        tint = colorScheme.onSurface
+                        imageVector         = Icons.Default.AccountCircle,
+                        contentDescription  = "Attendees",
+                        tint                = colorScheme.onSurface
                     )
                 }
 
                 IconButton(onClick = {}) {
                     Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Location",
-                        tint = colorScheme.onSurface
+                        imageVector         = Icons.Default.LocationOn,
+                        contentDescription  = "Location",
+                        tint                = colorScheme.onSurface
                     )
                 }
 
                 IconButton(onClick = {}) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Share",
-                        tint = colorScheme.onSurface
+                        imageVector         = Icons.AutoMirrored.Filled.Send,
+                        contentDescription  = "Share",
+                        tint                = colorScheme.onSurface
                     )
                 }
                 
@@ -176,9 +186,9 @@ fun EventCard(
                 // Bookmark icon on the right
                 IconButton(onClick = onBookmarkClick) {
                     Icon(
-                        imageVector = Icons.Default.BookmarkBorder,
-                        contentDescription = "Bookmark",
-                        tint = colorScheme.onSurface
+                        imageVector         = Icons.Default.BookmarkBorder,
+                        contentDescription  = "Bookmark",
+                        tint                = colorScheme.onSurface
                     )
                 }
             }
@@ -189,13 +199,13 @@ fun EventCard(
             ) {
                 // First row
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier                = Modifier.fillMaxWidth(),
+                    horizontalArrangement   = Arrangement.spacedBy(8.dp)
                 ) {
                     // Free tag
                     EventTag(
                         text = if (event.isFree) "Free" else "Paid",
-                        icon = Icons.Default.EventNote
+                        icon = Icons.AutoMirrored.Filled.EventNote
                     )
                     
                     // Date
@@ -226,7 +236,7 @@ fun EventCard(
                     
                     // Location
                     EventTag(
-                        icon = Icons.Default.Send,
+                        icon = Icons.AutoMirrored.Filled.Send,
                         text = event.location
                     )
                 }
@@ -248,6 +258,60 @@ fun EventCard(
                     EventTag(
                         text = if (event.locationConfirmed) "Location Confirmed" else "Confirm Location",
                         icon = Icons.Default.ShareLocation
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EventImageGallery(images: List<String>) {
+    if (images.size == 1) {
+        AsyncImage(
+            modifier            = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            model               = images[0],
+            contentDescription  = "Event image",
+            contentScale        = ContentScale.Crop
+        )
+    } else {
+        Box {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp)
+            ) {
+                items(images) { imageUrl ->
+                    AsyncImage(
+                        modifier            = Modifier
+                            .size(width = 280.dp, height = 200.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        model               = imageUrl,
+                        contentDescription  = "Event image",
+                        contentScale        = ContentScale.Crop
+                    )
+                }
+            }
+            
+            // Image counter indicator (top-right corner)
+            if (images.size > 1) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text        = "1/${images.size}",
+                        color       = Color.White,
+                        fontSize    = 12.sp,
+                        fontWeight  = FontWeight.Medium
                     )
                 }
             }

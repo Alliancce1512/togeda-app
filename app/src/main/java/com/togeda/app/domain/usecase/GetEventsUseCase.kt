@@ -8,4 +8,8 @@ class GetEventsUseCase(
     private val eventRepository: EventRepository
 ) {
     operator fun invoke(): Flow<List<Event>> = eventRepository.getEvents()
+    
+    suspend fun refreshEvents() {
+        eventRepository.refreshEvents()
+    }
 } 

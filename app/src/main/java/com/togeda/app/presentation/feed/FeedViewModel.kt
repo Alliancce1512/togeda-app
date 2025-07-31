@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class FeedViewModel(
-    private val getEventsUseCase: GetEventsUseCase,
-    private val authRepository: AuthRepository
+    private val getEventsUseCase    : GetEventsUseCase,
+    private val authRepository      : AuthRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FeedState())
@@ -39,12 +39,13 @@ class FeedViewModel(
             _state.update { it.copy(isLoading = true, eventsState = UiState.Loading) }
             
             try {
+                getEventsUseCase.refreshEvents()
                 getEventsUseCase().collect { events ->
                     _state.update { 
                         it.copy(
-                            events = events,
+                            events      = events,
                             eventsState = UiState.Success(events),
-                            isLoading = false
+                            isLoading   = false
                         )
                     }
                 }
@@ -52,13 +53,13 @@ class FeedViewModel(
                 _state.update { 
                     it.copy(
                         eventsState = UiState.Error(e.message ?: "Failed to load events"),
-                        isLoading = false
+                        isLoading   = false
                     )
                 }
             }
         }
     }
-    
+
     fun onLogoutClick() {
         _showLogoutDialog.value = true
     }

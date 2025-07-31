@@ -58,7 +58,6 @@ tasks.register("openApiGenerate") {
     description = "Generate API client from OpenAPI specification"
     
     doLast {
-        val openApiGeneratorVersion = "7.4.0"
         val inputSpec = "$projectDir/src/main/assets/api/api-docs.yaml"
         val outputDir = "${layout.buildDirectory.get()}/generated/openapi"
         
@@ -116,9 +115,12 @@ dependencies {
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.kotlin)
+    // Gson
+    implementation(libs.gson)
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.jackson)
+    implementation(libs.retrofit.gson)
     // Coil
     implementation(libs.coil.compose)
     // Core Library Desugaring

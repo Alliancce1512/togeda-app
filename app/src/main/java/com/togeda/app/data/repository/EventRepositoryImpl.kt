@@ -1,57 +1,48 @@
 package com.togeda.app.data.repository
 
+import com.togeda.app.data.location.LocationService
+import com.togeda.app.data.mapper.PostMapper
+import com.togeda.app.data.remote.PostsApi
 import com.togeda.app.domain.model.Event
 import com.togeda.app.domain.repository.EventRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-class EventRepositoryImpl : EventRepository {
-    private val eventsFlow = MutableStateFlow<List<Event>>(emptyList())
+class EventRepositoryImpl(
+    private val postsApi        : PostsApi,
+    private val locationService : LocationService
+) : EventRepository {
+    private val eventsFlow              = MutableStateFlow<List<Event>>(emptyList())
+    private var currentPage             = 0
+    private var isLastPage              = false
+    private var sessionId   : String?   = null
     
-    init {
-        // Mock data without network images to avoid permission issues
-        val mockEvents = listOf(
-            Event(
-                id = "1",
-                title = "Два дни в Милано",
-                organizer = "Nikolay Atanasov",
-                organizerAvatar = null,
-                imageUrl = null,
-                isFree = true,
-                startDate = "16.02",
-                endDate = "17.02",
-                startTime = "10:17",
-                endTime = "21:27",
-                currentAttendees = 2,
-                maxAttendees = 50,
-                location = "Sofiya, София-град, Бълга...",
-                isPublic = true,
-                locationConfirmed = false
-            ),
-            Event(
-                id = "2",
-                title = "Weekend in Paris",
-                organizer = "Maria Petrova",
-                organizerAvatar = null,
-                imageUrl = null,
-                isFree = false,
-                startDate = "20.02",
-                endDate = "22.02",
-                startTime = "09:00",
-                endTime = "18:00",
-                currentAttendees = 15,
-                maxAttendees = 30,
-                location = "Paris, France",
-                isPublic = true,
-                locationConfirmed = true
-            )
-        )
-        eventsFlow.value = mockEvents
-    }
-    
-    override fun getEvents(): Flow<List<Event>> = eventsFlow
+    override fun getEvents(): Flow<List<Event>> = eventsFlow.asStateFlow()
     
     override suspend fun refreshEvents() {
-        // Mock data refresh - no actual API call
+        try {
+            currentPage = 0
+            isLastPage  = false
+            sessionId   = null
+            
+            val (latitude, longitude) = locationService.getCurrentLocation()
+            
+            val response = postsApi.getAllPosts(
+                sortBy      = "CREATED_AT",
+                longitude   = longitude,
+                latitude    = latitude,
+                distance    = 50,
+                pageNumber  = 0,
+                pageSize    = 20
+            )
+
+            eventsFlow.value    = response.data.map { PostMapper.mapToEvent(it) }
+            currentPage         = 1
+            isLastPage          = response.lastPage
+            
+        } catch (e: Exception) {
+            throw e
+        }
     }
 } 
