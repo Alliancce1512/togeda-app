@@ -1,6 +1,7 @@
 package com.togeda.app.data.security
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import kotlinx.coroutines.flow.Flow
@@ -9,21 +10,27 @@ import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Secure token manager for storing and managing authentication tokens.
- * Uses EncryptedSharedPreferences for secure storage.
+ * Uses EncryptedSharedPreferences for secure storage with fallback to regular SharedPreferences.
  */
 class TokenManager(context: Context) {
 
-    private val masterKey = MasterKey.Builder(context)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
+    private val sharedPreferences: SharedPreferences = try {
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
 
-    private val encryptedSharedPreferences = EncryptedSharedPreferences.create(
-        context,
-        "secure_tokens",
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    )
+        EncryptedSharedPreferences.create(
+            context,
+            "secure_tokens",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    } catch (_: Exception) {
+        // Fallback to regular SharedPreferences if EncryptedSharedPreferences fails
+        // This can happen due to keystore corruption or device issues
+        context.getSharedPreferences("secure_tokens_fallback", Context.MODE_PRIVATE)
+    }
 
     private val _isLoggedIn = MutableStateFlow(hasValidTokens())
     val isLoggedIn: Flow<Boolean> = _isLoggedIn.asStateFlow()
@@ -44,7 +51,7 @@ class TokenManager(context: Context) {
         userId          : String,
         expiresIn       : Long? = null
     ) {
-        encryptedSharedPreferences.edit()
+        sharedPreferences.edit()
             .putString(KEY_ACCESS_TOKEN, accessToken)
             .putString(KEY_REFRESH_TOKEN, refreshToken)
             .putString(KEY_USER_ID, userId)
@@ -62,28 +69,28 @@ class TokenManager(context: Context) {
      * Get the stored access token
      */
     fun getAccessToken(): String? {
-        return encryptedSharedPreferences.getString(KEY_ACCESS_TOKEN, null)
+        return sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
     }
 
     /**
      * Get the stored refresh token
      */
     fun getRefreshToken(): String? {
-        return encryptedSharedPreferences.getString(KEY_REFRESH_TOKEN, null)
+        return sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
     }
 
     /**
      * Get the stored user ID
      */
     fun getUserId(): String? {
-        return encryptedSharedPreferences.getString(KEY_USER_ID, null)
+        return sharedPreferences.getString(KEY_USER_ID, null)
     }
 
     /**
      * Check if tokens are valid (not expired)
      */
     fun isTokenValid(): Boolean {
-        val expiryTime = encryptedSharedPreferences.getLong(KEY_TOKEN_EXPIRY, 0L)
+        val expiryTime = sharedPreferences.getLong(KEY_TOKEN_EXPIRY, 0L)
         return expiryTime == 0L || System.currentTimeMillis() < expiryTime
     }
 
@@ -105,7 +112,7 @@ class TokenManager(context: Context) {
      * Clear all stored tokens (logout)
      */
     fun clearTokens() {
-        encryptedSharedPreferences.edit()
+        sharedPreferences.edit()
             .remove(KEY_ACCESS_TOKEN)
             .remove(KEY_REFRESH_TOKEN)
             .remove(KEY_USER_ID)

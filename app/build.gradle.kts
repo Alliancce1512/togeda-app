@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.togeda.app"
-        minSdk = 26
+        minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -84,6 +84,28 @@ tasks.register("openApiGenerate") {
             }
         }
     }
+}
+
+// Make OpenAPI generation run before compilation
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    dependsOn("openApiGenerate")
+}
+
+// Task to clean and regenerate OpenAPI files
+tasks.register("openApiClean") {
+    group = "openapi"
+    description = "Clean generated OpenAPI files"
+    
+    doLast {
+        delete("${layout.buildDirectory.get()}/generated/openapi")
+    }
+}
+
+// Task to clean and regenerate
+tasks.register("openApiRegenerate") {
+    group = "openapi"
+    description = "Clean and regenerate OpenAPI files"
+    dependsOn("openApiClean", "openApiGenerate")
 }
 
 dependencies {
