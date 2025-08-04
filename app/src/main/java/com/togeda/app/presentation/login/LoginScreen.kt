@@ -184,7 +184,7 @@ fun LoginScreen(
                 )
             ) {
                 Text(
-                    text        = if (state.isLoading) "Signing In..." else stringResource(R.string.sign_in),
+                    text        = if (state.isLoading) stringResource(R.string.logging_in) else stringResource(R.string.login),
                     fontSize    = 18.sp,
                     fontWeight  = FontWeight.Medium
                 )
