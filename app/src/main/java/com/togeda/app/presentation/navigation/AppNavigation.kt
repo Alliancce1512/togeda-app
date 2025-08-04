@@ -41,7 +41,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         currentScreen = Screen.EventDetails(eventId)
     }
 
-    fun navigateBack() {
+    fun navigateBackToFeed() {
         currentScreen = Screen.Feed
     }
     
@@ -69,11 +69,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 EventDetailsScreen(
                     modifier        = modifier,
                     eventId         = screen.eventId,
-                    onBackClick     = { navigateBack() },
-                    onMoreClick     = { },
-                    onJoinClick     = { },
-                    onShareClick    = { },
-                    onBookmarkClick = { }
+                    onBackClick     = { navigateBackToFeed() }
                 )
             }
 

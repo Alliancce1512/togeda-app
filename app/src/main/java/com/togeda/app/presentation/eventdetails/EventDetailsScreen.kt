@@ -76,10 +76,10 @@ import org.koin.androidx.compose.koinViewModel
 fun EventDetailsScreen(
     eventId         : String,
     onBackClick     : () -> Unit,
-    onMoreClick     : () -> Unit,
-    onJoinClick     : () -> Unit,
-    onShareClick    : () -> Unit,
-    onBookmarkClick : () -> Unit,
+    onMoreClick     : () -> Unit = { },
+    onJoinClick     : () -> Unit = { },
+    onShareClick    : () -> Unit = { },
+    onBookmarkClick : () -> Unit = { },
     modifier        : Modifier = Modifier
 ) {
     val viewModel: EventDetailsViewModel = koinViewModel()
