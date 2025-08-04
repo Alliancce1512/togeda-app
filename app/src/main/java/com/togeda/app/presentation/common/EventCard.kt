@@ -1,9 +1,12 @@
 package com.togeda.app.presentation.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,16 +22,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Block
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.ShareLocation
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -61,11 +73,10 @@ fun EventCard(
     Card(
         modifier    = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onEventClick() },
         shape       = RoundedCornerShape(16.dp),
-        colors      = CardDefaults.cardColors(
-            containerColor = colorScheme.surface
-        )
+        colors      = CardDefaults.cardColors(containerColor = colorScheme.surface)
     ) {
         Column(
             modifier            = Modifier.padding(all = 16.dp),
@@ -78,26 +89,35 @@ fun EventCard(
                 horizontalArrangement   = Arrangement.SpaceBetween
             ) {
                 // Organizer avatar
-                Box(
-                    modifier            = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(colorScheme.tertiary),
-                    contentAlignment    = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector         = Icons.Default.Person,
+                if (!event.organizerAvatar.isNullOrEmpty()) {
+                    AsyncImage(
+                        modifier            = Modifier
+                            .size(52.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        model               = event.organizerAvatar,
                         contentDescription  = "Organizer avatar",
-                        tint                = colorScheme.onTertiary
+                        contentScale        = ContentScale.Crop
                     )
+                } else {
+                    Box(
+                        modifier            = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(colorScheme.tertiary),
+                        contentAlignment    = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector         = Icons.Default.Person,
+                            contentDescription  = "Organizer avatar",
+                            tint                = colorScheme.onTertiary
+                        )
+                    }
                 }
                 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 // Event title and organizer
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text        = event.title,
                         fontSize    = 18.sp,
@@ -195,72 +215,118 @@ fun EventCard(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // First row
-                Row(
+                val tags = generateEventTags(event)
+                
+                @OptIn(ExperimentalLayoutApi::class)
+                FlowRow(
                     modifier                = Modifier.fillMaxWidth(),
-                    horizontalArrangement   = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement   = Arrangement.spacedBy(8.dp),
+                    verticalArrangement     = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Free tag
-                    EventTag(
-                        text = if (event.isFree) "Free" else "Paid",
-                        icon = Icons.AutoMirrored.Filled.EventNote
-                    )
-                    
-                    // Date
-                    EventTag(
-                        icon = Icons.Default.CalendarToday,
-                        text = "${event.startDate} - ${event.endDate}"
-                    )
-                    
-                    // Time
-                    EventTag(
-                        icon = Icons.Default.Schedule,
-                        text = "${event.startTime} - ${event.endTime}"
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Second row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Attendees
-                    EventTag(
-                        icon = Icons.Default.Group,
-                        text = "${event.currentAttendees}/${event.maxAttendees}"
-                    )
-                    
-                    // Location
-                    EventTag(
-                        icon = Icons.AutoMirrored.Filled.Send,
-                        text = event.location
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Third row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Public tag
-                    EventTag(
-                        text = if (event.isPublic) "Public" else "Private",
-                        icon = Icons.Default.Public
-                    )
-                    
-                    // Confirm Location tag
-                    EventTag(
-                        text = if (event.locationConfirmed) "Location Confirmed" else "Confirm Location",
-                        icon = Icons.Default.ShareLocation
-                    )
+                    tags.forEach { eventTag ->
+                        InfoTag(
+                            text            = eventTag.text,
+                            icon            = eventTag.icon,
+                            backgroundColor = eventTag.backgroundColor,
+                            textColor       = eventTag.textColor,
+                            iconColor       = eventTag.iconColor
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+data class EventTag(
+    val text            : String,
+    val icon            : ImageVector?,
+    val backgroundColor : Color = Color(0xFF444444),
+    val textColor       : Color = Color.White,
+    val iconColor       : Color = Color.White
+)
+
+private fun generateEventTags(event: com.togeda.app.domain.model.Event): List<EventTag> {
+    val tags = mutableListOf<EventTag>()
+    
+    // Date and Time tags (only if not TBD)
+    if (event.startDate != "TBD" && event.endDate != "TBD") {
+        tags.add(EventTag("${event.startDate} - ${event.endDate}", Icons.Default.CalendarToday))
+    }
+    if (event.startTime != "TBD" && event.endTime != "TBD") {
+        tags.add(EventTag("${event.startTime} - ${event.endTime}", Icons.Default.Schedule))
+    }
+    
+    // Location tag (only if not TBD)
+    if (event.location != "Location TBD") {
+        tags.add(EventTag(event.location, Icons.Default.LocationOn))
+    }
+    
+    // Attendees tag (only if max attendees > 0)
+    if (event.maxAttendees > 0) {
+        tags.add(EventTag("${event.currentAttendees}/${event.maxAttendees}", Icons.Default.Group))
+    }
+    
+    // Status tag (only for non-active events)
+    when (event.status.uppercase()) {
+        "CANCELLED" -> tags.add(EventTag("Cancelled", Icons.Default.Cancel))
+        "COMPLETED" -> tags.add(EventTag("Completed", Icons.Default.Done))
+        "DRAFT" -> tags.add(EventTag("Draft", Icons.Default.Edit))
+        else -> {} // Don't show "Active" status as it's the default
+    }
+    
+    // User status tag (only for participating users)
+    when (event.currentUserStatus.uppercase()) {
+        "PARTICIPATING" -> tags.add(EventTag("Participating", Icons.Default.Person))
+        "PENDING" -> tags.add(EventTag("Pending", Icons.Default.Schedule))
+        "BLOCKED" -> tags.add(EventTag("Blocked", Icons.Default.Block))
+        else -> {} // Don't show "Not Participating" as it's the default
+    }
+    
+    // Payment tag
+    if (event.isFree) {
+        tags.add(EventTag("Free", Icons.AutoMirrored.Filled.EventNote))
+    } else {
+        tags.add(EventTag("Paid", Icons.Default.AttachMoney))
+    }
+    
+    // Accessibility tag
+    if (event.isPublic) {
+        tags.add(EventTag("Public", Icons.Default.Public))
+    } else {
+        tags.add(EventTag("Private", Icons.Default.Lock))
+    }
+    
+    // Location confirmation tag
+    if (event.locationConfirmed) {
+        tags.add(EventTag("Location Confirmed", Icons.Default.ShareLocation))
+    } else {
+        tags.add(EventTag("Confirm Location", Icons.Default.ShareLocation))
+    }
+    
+    // Ask to join tag
+    if (event.askToJoin) {
+        tags.add(EventTag("Approval Required", Icons.Default.Security))
+    }
+    
+    // Blocked tag
+    if (event.blockedForCurrentUser) {
+        tags.add(EventTag("Blocked", Icons.Default.Block))
+    }
+    
+    // Rating tag (if available)
+    event.rating?.let { rating ->
+        if (rating > 0) {
+            tags.add(EventTag("★ ${String.format("%.1f", rating)}", Icons.Default.Star))
+        }
+    }
+    
+    // Saved tag
+    if (event.savedByCurrentUser) {
+        tags.add(EventTag("Saved", Icons.Default.Bookmark))
+    }
+    
+    return tags
 }
 
 @Composable
@@ -314,40 +380,5 @@ private fun EventImageGallery(images: List<String>) {
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun EventTag(
-    text            : String,
-    backgroundColor : Color = Color(0xFF444444),
-    textColor       : Color = Color.White,
-    iconColor       : Color = Color.White,
-    icon            : ImageVector,
-    modifier        : Modifier = Modifier
-) {
-    Row(
-        modifier                = modifier
-            .background(
-                color = backgroundColor,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(all = 6.dp),
-        verticalAlignment       = Alignment.CenterVertically,
-        horizontalArrangement   = Arrangement.spacedBy(4.dp)
-    ) {
-        Icon(
-            modifier            = Modifier.size(16.dp),
-            imageVector         = icon,
-            contentDescription  = null,
-            tint                = iconColor
-        )
-
-        Text(
-            text            = text,
-            fontSize        = 12.sp,
-            color           = textColor,
-            fontWeight      = FontWeight.Medium
-        )
     }
 }

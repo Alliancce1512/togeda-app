@@ -45,4 +45,12 @@ class EventRepositoryImpl(
             throw e
         }
     }
+
+    override suspend fun getEventById(eventId: String): Event {
+        try {
+            return PostMapper.mapToEvent(postsApi.getPostById(eventId))
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 } 

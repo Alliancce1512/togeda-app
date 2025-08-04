@@ -1,30 +1,38 @@
 package com.togeda.app.domain.model
 
 data class Event(
-    val id                  : String,
-    val title               : String,
-    val description         : String?,
-    val organizer           : String,
-    val organizerAvatar     : String?,
-    val images              : List<String>,
-    val isFree              : Boolean,
-    val startDate           : String,
-    val endDate             : String,
-    val startTime           : String,
-    val endTime             : String,
-    val currentAttendees    : Int,
-    val maxAttendees        : Int,
-    val location            : String,
-    val locationDetails     : LocationDetails?,
-    val isPublic            : Boolean,
-    val locationConfirmed   : Boolean,
-    val payment             : Double,
-    val currency            : String?,
-    val status              : String,
-    val currentUserStatus   : String,
-    val savedByCurrentUser  : Boolean,
-    val rating              : Double?,
-    val interests           : List<String>
+    val id                      : String,
+    val title                   : String,
+    val description             : String?,
+    val organizer               : String,
+    val organizerOccupation     : String?,
+    val organizerAvatar         : String?,
+    val images                  : List<String>,
+    val isFree                  : Boolean,
+    val startDate               : String,
+    val endDate                 : String,
+    val startTime               : String,
+    val endTime                 : String,
+    val currentAttendees        : Int,
+    val maxAttendees            : Int,
+    val location                : String,
+    val locationDetails         : LocationDetails?,
+    val isPublic                : Boolean,
+    val locationConfirmed       : Boolean,
+    val payment                 : Double,
+    val currency                : String?,
+    val status                  : String,
+    val currentUserStatus       : String,
+    val savedByCurrentUser      : Boolean,
+    val rating                  : Double?,
+    val interests               : List<Interest>,
+    val askToJoin               : Boolean,
+    val blockedForCurrentUser   : Boolean
+)
+
+data class Interest(
+    val name : String,
+    val icon : String?
 )
 
 data class LocationDetails(

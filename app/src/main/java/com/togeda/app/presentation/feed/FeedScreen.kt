@@ -1,6 +1,7 @@
 package com.togeda.app.presentation.feed
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -41,20 +41,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.togeda.app.R
 import com.togeda.app.domain.model.Event
 import com.togeda.app.presentation.common.EventCard
+import com.togeda.app.presentation.common.InfoTag
 import com.togeda.app.presentation.common.UiState
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
-    viewModel   : FeedViewModel = koinViewModel(),
-    modifier    : Modifier      = Modifier
+    onEventClick    : (String) -> Unit  = {},
+    viewModel       : FeedViewModel     = koinViewModel(),
+    modifier        : Modifier          = Modifier
 ) {
     val state by viewModel.state.collectAsState()
     val colorScheme = colorScheme
@@ -89,8 +93,9 @@ fun FeedScreen(
             ) {
                 when (state.selectedTab) {
                     FeedTab.EVENTS  -> EventsContent(
-                        eventsState = state.eventsState,
-                        onRefresh   = viewModel::onRefresh
+                        eventsState     = state.eventsState,
+                        onRefresh       = viewModel::onRefresh,
+                        onEventClick    = onEventClick
                     )
                     FeedTab.CLUBS   -> ClubsContent()
                     FeedTab.FRIENDS -> FriendsContent()
@@ -113,20 +118,16 @@ fun FeedScreen(
         if (showLogoutDialog) {
             AlertDialog(
                 onDismissRequest    = viewModel::onLogoutCancel,
-                title               = { Text("Logout") },
-                text                = { Text("Are you sure you want to logout?") },
+                title               = { Text(stringResource(R.string.logout)) },
+                text                = { Text(stringResource(R.string.logout_confirmation)) },
                 confirmButton       = {
-                    TextButton(
-                        onClick = viewModel::onLogoutConfirm
-                    ) {
-                        Text("Yes, Logout")
+                    TextButton(onClick = viewModel::onLogoutConfirm) {
+                        Text(stringResource(R.string.yes_logout))
                     }
                 },
                 dismissButton       = {
-                    TextButton(
-                        onClick = viewModel::onLogoutCancel
-                    ) {
-                        Text("Cancel")
+                    TextButton(onClick = viewModel::onLogoutCancel) {
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             )
@@ -150,7 +151,7 @@ private fun TopBar(
         // App title
         Text(
             modifier    = Modifier.weight(1f),
-            text        = "Togeda",
+            text        = stringResource(R.string.app_name),
             fontSize    = 28.sp,
             fontWeight  = FontWeight.Bold,
             color       = colorScheme.onBackground
@@ -225,29 +226,23 @@ private fun TabNavigation(
     ) {
         FeedTab.entries.forEach { tab ->
             val isSelected = tab == selectedTab
-            Button(
-                onClick     = { onTabSelected(tab) },
-                modifier    = Modifier.weight(1f),
-                shape       = RoundedCornerShape(20.dp),
-                colors      = ButtonDefaults.buttonColors(
-                    containerColor  = if (isSelected) colorScheme.primary else colorScheme.surface,
-                    contentColor    = if (isSelected) colorScheme.onPrimary else colorScheme.onSurface
-                )
-            ) {
-                Text(
-                    text        = tab.name,
-                    fontSize    = 14.sp,
-                    fontWeight  = FontWeight.Medium
-                )
-            }
+
+            InfoTag(
+                text = getTabDisplayName(tab),
+                backgroundColor = if (isSelected) colorScheme.primary else colorScheme.surface,
+                textColor = if (isSelected) colorScheme.onPrimary else colorScheme.onSurface,
+                iconColor = if (isSelected) colorScheme.onPrimary else colorScheme.onSurface,
+                modifier = Modifier.clickable { onTabSelected(tab) }
+            )
         }
     }
 }
 
 @Composable
 private fun EventsContent(
-    eventsState : UiState<List<Event>>,
-    onRefresh   : () -> Unit
+    eventsState     : UiState<List<Event>>,
+    onRefresh       : () -> Unit,
+    onEventClick    : (String) -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -282,25 +277,23 @@ private fun EventsContent(
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Text(
-                                text        = "No events found",
+                                text        = stringResource(R.string.no_events_found),
                                 fontSize    = 18.sp,
                                 fontWeight  = FontWeight.Medium,
                                 color       = colorScheme.onBackground,
                                 textAlign   = TextAlign.Center
                             )
                             Text(
-                                text        = "Try refreshing or check back later",
+                                text        = stringResource(R.string.no_events_description),
                                 fontSize    = 14.sp,
                                 color       = colorScheme.onSurfaceVariant,
                                 textAlign   = TextAlign.Center
                             )
                             Button(
                                 onClick = onRefresh,
-                                colors  = ButtonDefaults.buttonColors(
-                                    containerColor = colorScheme.primary
-                                )
+                                colors  = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                             ) {
-                                Text("Refresh")
+                                Text(stringResource(R.string.refresh))
                             }
                         }
                     }
@@ -312,7 +305,7 @@ private fun EventsContent(
                         items(events) { event ->
                             EventCard(
                                 event           = event,
-                                onEventClick    = { },
+                                onEventClick    = { onEventClick(event.id) },
                                 onBookmarkClick = { },
                                 onMoreClick     = { }
                             )
@@ -330,7 +323,7 @@ private fun EventsContent(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text        = "Failed to load events",
+                            text        = stringResource(R.string.failed_to_load_events),
                             fontSize    = 18.sp,
                             fontWeight  = FontWeight.Medium,
                             color       = colorScheme.error,
@@ -344,11 +337,9 @@ private fun EventsContent(
                         )
                         Button(
                             onClick = onRefresh,
-                            colors  = ButtonDefaults.buttonColors(
-                                containerColor = colorScheme.primary
-                            )
+                            colors  = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                         ) {
-                            Text("Try Again")
+                            Text(stringResource(R.string.try_again))
                         }
                     }
                 }
@@ -364,7 +355,7 @@ private fun ClubsContent() {
         contentAlignment    = Alignment.Center
     ) {
         Text(
-            text    = "Clubs content coming soon",
+            text    = stringResource(R.string.clubs_content_coming_soon),
             color   = colorScheme.onBackground
         )
     }
@@ -377,7 +368,7 @@ private fun FriendsContent() {
         contentAlignment    = Alignment.Center
     ) {
         Text(
-            text    = "Friends content coming soon",
+            text    = stringResource(R.string.friends_content_coming_soon),
             color   = colorScheme.onBackground
         )
     }
@@ -438,8 +429,16 @@ private fun BottomNavigation() {
                 modifier            = Modifier.size(24.dp),
                 imageVector         = Icons.Default.AccountCircle,
                 contentDescription  = "Profile",
-                tint                = colorScheme.surface,
+                tint                = Color(0xFF444444)
             )
         }
+    }
+} 
+
+private fun getTabDisplayName(tab: FeedTab): String {
+    return when (tab) {
+        FeedTab.EVENTS  -> "Events"
+        FeedTab.CLUBS   -> "Clubs"
+        FeedTab.FRIENDS -> "Friends"
     }
 } 

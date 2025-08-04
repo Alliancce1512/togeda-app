@@ -2,6 +2,7 @@ package com.togeda.app.data.mapper
 
 import com.togeda.app.data.remote.PostResponseDto
 import com.togeda.app.domain.model.Event
+import com.togeda.app.domain.model.Interest
 import com.togeda.app.domain.model.LocationDetails
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -51,7 +52,13 @@ object PostMapper {
                 longitude   = location.longitude ?: 0.0
             )
         }
-        val interests   = post.interests?.map { it.name ?: "" }?.filter { it.isNotEmpty() } ?: emptyList()
+        val interests   = post.interests?.map { interest ->
+            Interest(
+                name = interest.name ?: "",
+                icon = interest.icon
+            )
+        }?.filter { it.name.isNotEmpty() } ?: emptyList()
+
         val payment     = post.payment ?: 0.0
         val isFree      = payment <= 0.0
 
@@ -64,6 +71,7 @@ object PostMapper {
         }
 
         val organizerAvatar             = post.owner?.profilePhotos?.firstOrNull()
+        val organizerOccupation         = post.owner?.occupation
         val images                      = post.images ?: emptyList()
         val maxAttendees                = post.maximumPeople ?: 0
         val currentAttendees            = post.participantsCount ?: 0
@@ -74,32 +82,37 @@ object PostMapper {
         val savedByCurrentUser          = post.savedByCurrentUser ?: false
         val rating                      = post.rating
         val currencySymbol              = post.currency?.symbol
+        val askToJoin                   = post.askToJoin ?: false
+        val blockedForCurrentUser       = post.blockedForCurrentUser ?: false
         
         return Event(
-            id                  = post.id ?: "",
-            title               = post.title ?: "Untitled Event",
-            description         = post.description,
-            organizer           = organizer,
-            organizerAvatar     = organizerAvatar,
-            images              = images,
-            isFree              = isFree,
-            startDate           = startDate,
-            endDate             = endDate,
-            startTime           = startTime,
-            endTime             = endTime,
-            currentAttendees    = currentAttendees,
-            maxAttendees        = maxAttendees,
-            location            = locationString,
-            locationDetails     = locationDetails,
-            isPublic            = accessibility == "PUBLIC",
-            locationConfirmed   = !needsLocationalConfirmation,
-            payment             = payment,
-            currency            = currencySymbol,
-            status              = status,
-            currentUserStatus   = currentUserStatus,
-            savedByCurrentUser  = savedByCurrentUser,
-            rating              = rating,
-            interests           = interests
+            id                      = post.id ?: "",
+            title                   = post.title ?: "Untitled Event",
+            description             = post.description,
+            organizer               = organizer,
+            organizerOccupation     = organizerOccupation,
+            organizerAvatar         = organizerAvatar,
+            images                  = images,
+            isFree                  = isFree,
+            startDate               = startDate,
+            endDate                 = endDate,
+            startTime               = startTime,
+            endTime                 = endTime,
+            currentAttendees        = currentAttendees,
+            maxAttendees            = maxAttendees,
+            location                = locationString,
+            locationDetails         = locationDetails,
+            isPublic                = accessibility == "PUBLIC",
+            locationConfirmed       = !needsLocationalConfirmation,
+            payment                 = payment,
+            currency                = currencySymbol,
+            status                  = status,
+            currentUserStatus       = currentUserStatus,
+            savedByCurrentUser      = savedByCurrentUser,
+            rating                  = rating,
+            interests               = interests,
+            askToJoin               = askToJoin,
+            blockedForCurrentUser   = blockedForCurrentUser
         )
     }
 } 

@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Togeda</string>
+    
+    <!-- Login Screen -->
     <string name="login_title">Sign In to Your Account</string>
     <string name="email_label">Email</string>
     <string name="password_label">Password</string>
@@ -13,4 +15,82 @@
     <string name="login_error_invalid_credentials">Invalid email or password</string>
     <string name="login_error_empty_fields">Email and password cannot be empty</string>
     <string name="login_error_failed">Login failed</string>
+    
+    <!-- Feed Screen -->
+    <string name="logout">Logout</string>
+    <string name="logout_confirmation">Are you sure you want to logout?</string>
+    <string name="yes_logout">Yes, Logout</string>
+    <string name="cancel">Cancel</string>
+    <string name="no_events_found">No events found</string>
+    <string name="no_events_description">Try refreshing or check back later</string>
+    <string name="refresh">Refresh</string>
+    <string name="try_again">Try Again</string>
+    <string name="failed_to_load_events">Failed to load events</string>
+    <string name="clubs_content_coming_soon">Clubs content coming soon</string>
+    <string name="friends_content_coming_soon">Friends content coming soon</string>
+    
+    <!-- Event Details Screen -->
+    <string name="join">Join</string>
+    <string name="description">Description</string>
+    <string name="location">Location</string>
+    <string name="interests">Interests</string>
+    <string name="confirm_location">Confirm Location</string>
+    <string name="confirm_location_description">You will have to confirm your attendance once you reach the destination via the app. Failing to do so may result in being marked as a no-show.</string>
+    <string name="location_confirmed">Location Confirmed</string>
+    <string name="event_public">Public</string>
+    <string name="public_description">Everyone can join the event</string>
+    <string name="event_private">Private</string>
+    <string name="free">Free</string>
+    <string name="free_description">No payment required</string>
+    <string name="paid">Paid</string>
+    <string name="paid_description">Payment required</string>
+    <string name="participants">Participants</string>
+    <string name="join_event">Join the event</string>
+    
+    <!-- Event Tags -->
+    <string name="cancelled">Cancelled</string>
+    <string name="completed">Completed</string>
+    <string name="draft">Draft</string>
+    <string name="participating">Participating</string>
+    <string name="pending">Pending</string>
+    <string name="blocked">Blocked</string>
+    <string name="approval_required">Approval Required</string>
+    <string name="saved">Saved</string>
+    
+    <!-- Navigation -->
+    <string name="back">Back</string>
+    <string name="more_options">More options</string>
+    <string name="home">Home</string>
+    <string name="map">Map</string>
+    <string name="add">Add</string>
+    <string name="chat">Chat</string>
+    <string name="profile">Profile</string>
+    
+    <!-- Content Descriptions -->
+    <string name="organizer_avatar">Organizer avatar</string>
+    <string name="event_image">Event image</string>
+    <string name="no_event_image">No event image</string>
+    <string name="location_confirmation">Location confirmation</string>
+    <string name="bookmark">Bookmark</string>
+    <string name="more_options_icon">More options</string>
+    <string name="attendees">Attendees</string>
+    <string name="location_icon">Location</string>
+    <string name="calendar_icon">Calendar</string>
+    <string name="schedule_icon">Schedule</string>
+    <string name="group_icon">Group</string>
+    <string name="public_icon">Public</string>
+    <string name="private_icon">Private</string>
+    <string name="share_location_icon">Share location</string>
+    <string name="security_icon">Security</string>
+    <string name="star_icon">Star</string>
+    <string name="bookmark_icon">Bookmark</string>
+    <string name="cancel_icon">Cancel</string>
+    <string name="done_icon">Done</string>
+    <string name="edit_icon">Edit</string>
+    <string name="person_icon">Person</string>
+    <string name="person_off_icon">Person off</string>
+    <string name="block_icon">Block</string>
+    <string name="attach_money_icon">Attach money</string>
+    <string name="lock_icon">Lock</string>
+    <string name="info_icon">Info</string>
 </resources>

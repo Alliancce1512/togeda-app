@@ -1,6 +1,7 @@
 package com.togeda.app.data.remote
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 data class PostsResponse(
@@ -58,7 +59,8 @@ data class MiniUser(
     val id              : String?,
     val firstName       : String?,
     val lastName        : String?,
-    val profilePhotos   : List<String>?
+    val profilePhotos   : List<String>?,
+    val occupation      : String?
 )
 
 data class Currency(
@@ -80,4 +82,7 @@ interface PostsApi {
         @Query("toDate") toDate         : String?       = null,
         @Query("fromDate") fromDate     : String?       = null
     ): PostsResponse
+
+    @GET("posts/{postId}")
+    suspend fun getPostById(@Path("postId") postId: String): PostResponseDto
 } 

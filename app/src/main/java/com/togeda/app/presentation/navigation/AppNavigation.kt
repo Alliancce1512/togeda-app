@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.togeda.app.domain.repository.AuthRepository
+import com.togeda.app.presentation.eventdetails.EventDetailsScreen
 import com.togeda.app.presentation.feed.FeedScreen
 import com.togeda.app.presentation.login.LoginScreen
 import com.togeda.app.presentation.login.LoginViewModel
@@ -19,8 +20,9 @@ import org.koin.androidx.compose.get
 import org.koin.androidx.compose.koinViewModel
 
 sealed class Screen {
-    object Login    : Screen()
-    object Feed     : Screen()
+    object Login                                    : Screen()
+    object Feed                                     : Screen()
+    data class EventDetails(val eventId: String)    : Screen()
 }
 
 @Composable
@@ -33,6 +35,14 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         authRepository.isLoggedIn().collect { isLoggedIn ->
             currentScreen = if (isLoggedIn) Screen.Feed else Screen.Login
         }
+    }
+
+    fun navigateToEventDetails(eventId: String) {
+        currentScreen = Screen.EventDetails(eventId)
+    }
+
+    fun navigateBack() {
+        currentScreen = Screen.Feed
     }
     
     when (currentScreen) {
@@ -50,8 +60,23 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
         Screen.Feed     -> {
             FeedScreen(
-                modifier = modifier
+                modifier        = modifier,
+                onEventClick    = { eventId -> navigateToEventDetails(eventId) }
             )
+        }
+        is Screen.EventDetails -> {
+            (currentScreen as? Screen.EventDetails)?.let { screen ->
+                EventDetailsScreen(
+                    modifier        = modifier,
+                    eventId         = screen.eventId,
+                    onBackClick     = { navigateBack() },
+                    onMoreClick     = { },
+                    onJoinClick     = { },
+                    onShareClick    = { },
+                    onBookmarkClick = { }
+                )
+            }
+
         }
         null            -> {
             // Loading state

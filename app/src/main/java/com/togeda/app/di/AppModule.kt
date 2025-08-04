@@ -10,8 +10,10 @@ import com.togeda.app.data.repository.EventRepositoryImpl
 import com.togeda.app.data.security.TokenManager
 import com.togeda.app.domain.repository.AuthRepository
 import com.togeda.app.domain.repository.EventRepository
+import com.togeda.app.domain.usecase.GetEventByIdUseCase
 import com.togeda.app.domain.usecase.GetEventsUseCase
 import com.togeda.app.domain.usecase.LoginUseCase
+import com.togeda.app.presentation.eventdetails.EventDetailsViewModel
 import com.togeda.app.presentation.feed.FeedViewModel
 import com.togeda.app.presentation.login.LoginViewModel
 import okhttp3.OkHttpClient
@@ -107,8 +109,10 @@ val appModule = module {
     // Use Cases
     single { LoginUseCase(get()) }
     single { GetEventsUseCase(get()) }
+    single { GetEventByIdUseCase(get()) }
     
     // ViewModels
     viewModel { LoginViewModel(get()) }
     viewModel { FeedViewModel(get(), get()) }
+    viewModel { EventDetailsViewModel(get()) }
 }
